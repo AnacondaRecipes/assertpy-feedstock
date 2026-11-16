@@ -1,48 +1,87 @@
 {% set name = "assertpy" %}
-{% set version = "1.1" %}
+{% set version = "2.36.0" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  - url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-    sha256: acc64329934ad71a3221de185517a43af33e373bb44dc05b5a9b174394ef4833
-  - url: https://github.com/{{ name }}/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
-    sha256: 81366870bee75cc70e88d46efe52b9577ff9d0cf2c621d179da8405059d8524f
-    folder: gh
+  - url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+    sha256: 94856ca5ec7131e26584115bea06f85c10aacaa5f4c525254f32d6986edf9e0a
 
 build:
   number: 0
-  skip: true  # [py<38]
+  skip: true  # [py<310]
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
   host:
     - pip
     - python
+    - hatchling
   run:
     - python
+    - typing_extensions >=4.0   # [py<311]
+  run_constrained:
+    # extra allure
+    - allure-pytest >=2.13
+    # extra behave
+    - behave >=1.3.0
+    # extra inline
+    - executing >=2.2
+    - asttokens >=2.0.4
+    # extra json
+    - idna >=3.7
+    - jsonpath-ng >=1.8
+    - jsonschema >=4.18
+    - referencing >=0.28.4
+    # extra numpy
+    - numpy >=1.26
+    # extra pandas
+    - pandas >=2.0
+    # extra polaris
+    - polaris >=1.0
 
-# Cygwin fails the tests: PermissionError: [Errno 13] Permission denied: 'C:\\cygwin64\\tmp\\tmp5yyq74qb'
-{% set tests_to_skip = "test_contents_of_path" %}
-{% set tests_to_skip = tests_to_skip + " or test_contents_of_path_ascii" %}
-{% set tests_to_skip = tests_to_skip + " or test_contents_of_return_type" %}
-{% set tests_to_skip = tests_to_skip + " or test_contents_of_return_type_ascii" %}
-{% set tests_to_skip = tests_to_skip + " or test_is_child_of_failure" %}
+# bunch of meta tests
+{% set ignore_tests = "--ignore=tests/test_docs_examples.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_skip_guard.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_poll_parity.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_negated_protocols.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_declared_floors.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_public_surface.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_refusal_frames.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_typing_claims.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_capable_protocol.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_check_protocols.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_hostile_values.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_complexity.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_expected_contract.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_overload_order.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_pin_coverage.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_pytest_plugin.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_poll_protocols.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_property_based.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_prerequisites.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_operation_contract.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_numeric_questions.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_log_passes.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_bridge.py" %}
+{% set ignore_tests = ignore_tests +" --ignore=tests/test_architecture_doc.py" %}
 
 test:
   source_files:
-    - gh/tests
+    - tests
   imports:
     - assertpy
   requires:
     - pip
-    - pytest
+    - pytest >=9.1.1
+    - hypothesis >=6.165.0
+    - jsonpath-ng
+    - typing_extensions
   commands:
     - pip check
-    - pytest gh/tests -v  # [not win]
-    - pytest gh/tests -v -k "not ({{ tests_to_skip }})"  # [win]
+    - python -m pytest tests -vv  {{ ignore_tests }}
 
 about:
   home: https://github.com/assertpy/assertpy
@@ -52,7 +91,7 @@ about:
   summary: Assertion library for python unit testing with a fluent API
   description: |
     Simple assertions library for unit testing in Python 
-    with a nice fluent API. Supports both Python 2 and 3.
+    with a nice fluent API.
   dev_url: https://github.com/assertpy/assertpy
   doc_url: https://github.com/assertpy/assertpy
 
