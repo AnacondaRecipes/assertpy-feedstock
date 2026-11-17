@@ -39,8 +39,8 @@ requirements:
     - numpy >=1.26
     # extra pandas
     - pandas >=2.0
-    # extra polaris
-    - polaris >=1.0
+    # extra polars
+    - polars >=1.0
 
 # bunch of meta tests
 {% set ignore_tests = "--ignore=tests/test_docs_examples.py" %}
